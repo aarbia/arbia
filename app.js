@@ -3,8 +3,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-// add this line BEFORE var indexRouter = require('./routes/index');
-var env = require('dotenv').config();
 var indexRouter = require('./routes/index');   // index.js
 var usersRouter = require('./routes/users');   // users.js
 
@@ -12,7 +10,7 @@ var app = express();
 
 
 // new stuff starts here
-var session = require('cookie-session');
+var session = require('express-session');
 
 // Flash is needed for passport middleware
 var flash = require('express-flash');
@@ -72,18 +70,12 @@ passport.deserializeUser(function(id, done) {
 // Use the session middleware
 // configure session object to handle cookie
 // req.flash() requires sessions
-
-app.set('trust proxy', 1)
 // secret: 'webDev' This is the secret used to sign the session ID cookie.
 // It should be a long, randomly-generated string to ensure security.
 app.use(session({
   secret: 'WebDev',
   resave:false,
   saveUninitialized: true,
-  //cookie.secure: true means that the cookie is sent only over HTTPS
-  cookie: {
-    secure: (process.env.NODE_ENV && process.env.NODE_ENV == 'production') ? true:false
-  }
 }));
 
 app.use(flash());

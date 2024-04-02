@@ -26,16 +26,23 @@ client.connect();
 var passport = require('passport');
 var bcrypt = require('bcryptjs');
 
-router.get('/logout', function(req, res){
-  req.logout();   //passport provide it
+router.get('/logout', function(req, res, next){
+  req.logout(function(err) {
+    if (err) {
+      console.log("unable to logout:", err);
+      return next(err);
+    }
+  });   //passport provide it
   res.redirect('/'); // Successful. redirect to localhost:3000/
 });
+
+
 
 function loggedIn(req, res, next) {
   if (req.user) {
     next(); // req.user exists, go to the next function (right after loggedIn)
   } else {
-    res.redirect('/users/login'); // user doesn't exists, redirect to localhost:3000/users/login
+    res.redirect('/users/login'); // user doesn't exists redirect to localhost:3000/users/login
   }
 }
 
@@ -61,17 +68,18 @@ router.get('/login', notLoggedIn, function(req, res){
 
 // localhost:3000/users/login
 router.post('/login',
-  // This is where authentication happens - app.js (passport.use
+  // This is where authentication happens - app.js
   // authentication locally (not using passport-google, passport-twitter, passport-github...)
-  passport.authenticate('local', { failureRedirect: '/login?message=Incorrect+credentials', failureFlash:true }),
+  passport.authenticate('local', { failureRedirect: 'login?message=Incorrect+credentials', failureFlash:true }),
   function(req, res,next) {
     let prefer = req.user.prefer;
     console.log("fullname: ", prefer);
     res.redirect('/users/profile?name='+prefer); // Successful. redirect to localhost:3000/users/profile
 });
 
+
 router.get('/signup',function(req, res) {
-  // If logged in (req.user exists), go to profile page
+  // If logged in, go to profile page
   if(req.user) {
     let prefer = req.user.prefer;
     return res.redirect('/users/profile?name='+prefer);
