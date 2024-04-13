@@ -5,9 +5,8 @@
 </head>
 
 <body> 
-  <div id= "message"></div>
+  <div id="message"></div>
   <h2>Please add a new assignment</h2>
-  
   <form method="post" action="/exam/addAssignment">
   <div style = "float:left; width: 200px;">Student Username </div>
     <input type="text" name="username" placeholder="username"><br>
@@ -20,7 +19,13 @@
   </form>
 
   <br> <a href="/exam/admin">Back to Main Administrative Page</a><br>
-
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get('message');
+    if (message) {
+      document.getElementById('message').innerHTML = name;
+    }
+  </script>
 
 </body>
 </html>

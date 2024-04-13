@@ -5,9 +5,7 @@ body {
 a {
   color: #00B7FF;
 }
-#message {
-  color: red;
-}
+
 nav ul li {
   display: inline;
   list-style-type: none;

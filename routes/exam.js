@@ -91,12 +91,92 @@ router.post('/addAssignment',function(req, res, next) {
             next(err);
           }
           console.log("Assignment creation is successful");
-          res.redirect('/exam/addAssignment');
+          res.redirect('/exam/addAssignment?message=Created+assignment+successfully');
         });
     }
     else {
       console.log("user doesn't exist");
-      res.redirect('/exam/addAssignment');
+      res.redirect('/exam/addAssignment?message=User+does+not+exist');
+    }
+  });
+});
+
+router.get('/changePassword',function(req, res, next) {
+  res.sendFile(path.join(__dirname,'..', 'public','changePassword.html'));
+});
+
+function changePassword(req, res, next){
+  var salt = bcrypt.genSaltSync(10);
+  var newPassword = bcrypt.hashSync(req.body.newPassword, salt);
+
+  console.log("passwords match, lets change");
+  client.query('UPDATE examusers set password=$1 where username=$2', [newPassword, req.user.username], function(err, result) {
+    if (err) {
+      console.log("unable to query UPDATE");
+      return next(err); // throw error to error.hbs.
+    }
+    console.log("Passowrd change successful");
+    res.redirect('/exam/changePassword?message=You+successfully+changed+password!');
+  });
+}
+
+router.post('/changePassword', function(req, res, next) {
+  client.query('SELECT * FROM examusers WHERE username = $1 AND password = $2', [req.user.username, req.user.password], function(err, result) {
+    if (err) {
+      console.log("unable to query SELECT");
+      next(err);
+    }
+    var userPassword =  result.rows[0];
+    if (result.rows.length > 0) {
+      let matched = bcrypt.compareSync(req.body.password, userPassword.password);
+      if (!matched) {
+        console.log("incorrect password");
+        res.redirect('/exam/changePassword?message=Current+password+does+not+match');
+      } 
+    
+      else if (req.body.newPassword != req.body.newPasswordConfirm){
+        console.log("two passwords are not the same");
+        res.redirect('/exam/changePassword?message=The+two+passwords+you+entered+are+not+the+same');
+      }
+      else{
+        console.log("passwords match, lets change");
+        changePassword(req, res, next);
+      }
+    }
+  });
+});
+
+router.get('/addUser',function(req, res, next) {
+  res.sendFile(path.join(__dirname,'..', 'public','addUser.html'));
+});
+
+function createUser(req, res, next){
+  var salt = bcrypt.genSaltSync(10);
+  var password = bcrypt.hashSync(req.body.password, salt);
+
+  client.query('INSERT INTO examusers (username, password, isAdmin) VALUES($1, $2, $3)', [req.body.username, password,req.body.isAdmin], function(err, result) {
+    if (err) {
+      console.log("unable to query INSERT");
+      return next(err); // throw error to error.hbs.
+    }
+    console.log("User creation is successful");
+    res.redirect('/exam/addUser?message=We+created+your+account+successfully!');
+  });
+}
+
+router.post('/addUser',function(req, res, next) {
+  client.query('SELECT * FROM examusers WHERE username=$1',[req.body.username], function(err,result){
+    if (err) {
+      console.log("sql error ");
+      next(err); // throw error to error.hbs.
+    }
+    else if (result.rows.length > 0) {
+      console.log("user exists");
+      res.redirect('/exam/addUser?message=User+exists');
+    }
+    else {
+      console.log("no user with that name");
+      createUser(req, res, next);
     }
   });
 });

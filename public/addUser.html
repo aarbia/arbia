@@ -1,0 +1,39 @@
+<html>
+<head>
+  <title>Express</title>
+  <link rel="stylesheet" href="/stylesheets/style.css"> 
+</head>
+
+<body> 
+  <div id="message"></div>
+  <h2>Please add a new user</h2>
+  <form method="post" action="/exam/addUser">
+  <div style = "float:left; width: 200px;">Username</div>
+    <input type="text" name="username" placeholder="username"><br>
+  <div style = "float:left; width: 200px;">&nbsp;</div>
+    <input type="radio" id="admin" name="isAdmin" value="admin">
+      <label for="admin">admin</label>
+    <input type="radio" id="student" name="isAdmin" value="student">
+      <label for="student">student</label><br>
+  <div style = "float:left; width: 200px;">Password</div>
+    <input type="password" name="password" id="password" placeholder="password"><br>
+    <div style = "float:left; width: 200px;">&nbsp;</div>
+      <div class="checkbox mb-3">
+        <label><input type="checkbox" onclick="showPassword()"> Show password</label>
+      </div>
+  <br><div style = "float:left; width: 200px;">&nbsp;</div>
+    <input type="submit" value="Submit the user information">
+  </form>
+
+  <br> <a href="/exam/admin">Back to Main Administrative Page</a><br>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get('message');
+    if (message) {
+      document.getElementById('message').innerHTML = name;
+    }
+  </script>
+  <script src="/javascripts/showPassword.js" ></script>
+
+</body>
+</html>
